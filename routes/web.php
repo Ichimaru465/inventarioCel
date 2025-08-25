@@ -18,11 +18,11 @@ use App\Models\Brand;
 
 // ... rutas que ya tenías ...
 
-Route::get('/login', function () {
+Route::get('/', function () {
     return view('auth.login');
 })->name('login');
 
-Route::post('/login', function (Request $request) {
+Route::post('/', function (Request $request) {
     $credentials = $request->validate([
         'email' => ['required', 'email'],
         'password' => ['required'],
