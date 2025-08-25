@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Ventas del Día - InventarioCel</title>
+    <style>
+        body { font-family: 'Nunito', sans-serif; font-size: 12px; }
+        h1 { text-align: center; }
+        .date-header { text-align: center; margin-bottom: 20px; color: #555; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        tfoot tr td { font-weight: bold; background-color: #f2f2f2; }
+        .text-right { text-align: right; }
+    </style>
+</head>
+<body onload="window.print()">
+    <h1>Reporte de Ventas del Día</h1>
+    <p class="date-header">Fecha: {{ now()->format('d/m/Y') }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Hora</th>
+                <th>Producto</th>
+                <th>SKU</th>
+                <th>Cant.</th>
+                <th>Precio Unit.</th>
+                <th>Subtotal</th>
+                <th>Vendido por</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($salesToday as $sale)
+                <tr>
+                    <td>{{ $sale->created_at->format('h:i A') }}</td>
+                    <td>{{ $sale->product->name ?? 'N/A' }}</td>
+                    <td>{{ $sale->product->sku ?? 'N/A' }}</td>
+                    <td>{{ $sale->quantity }}</td>
+                    <td class="text-right">S/ {{ number_format($sale->product->price ?? 0, 2) }}</td>
+                    <td class="text-right">S/ {{ number_format($sale->quantity * ($sale->product->price ?? 0), 2) }}</td>
+                    <td>{{ $sale->user->name ?? 'N/A' }}</td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="7" style="text-align: center;">No hay ventas que mostrar para hoy.</td>
+                </tr>
+            @endforelse
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" class="text-right"><strong>TOTALES</strong></td>
+                <td><strong>{{ $totalItems }}</strong></td>
+                <td colspan="1"></td>
+                <td class="text-right"><strong>S/ {{ number_format($totalRevenue, 2) }}</strong></td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>
