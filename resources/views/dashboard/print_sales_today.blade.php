@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Reporte de Ventas del Día - InventarioCel</title>
+    <title>Reporte de Ventas del Día - Accesorios Ramirez</title>
     <style>
         body { font-family: 'Nunito', sans-serif; font-size: 12px; }
         h1 { text-align: center; }

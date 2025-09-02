@@ -18,7 +18,7 @@ class AttributeSeeder extends Seeder
             'Compatibilidad', 'Marca Compatible', 'Modelo Compatible',
             'Conectividad', 'Idioma',
             'Almacenamiento (GB)', 'RAM (GB)', 'Pantalla (pulgadas)',
-            'Tipo de Repuesto', 'Tipo de Foco', 'Tipo de Rosca', 'Color de Luz'
+            'Tipo de Repuesto', 'Tipo de Foco', 'Tipo de Rosca', 'Color de Luz', 'Genero'
         ])->map(function ($name) {
             return Attribute::firstOrCreate(['name' => $name]);
         });
@@ -65,7 +65,8 @@ class AttributeSeeder extends Seeder
                 $findAttribute('Material'),
                 $findAttribute('Diseño'),
                 $findAttribute('Acabado'), // Ej: Transparente, Matte, Antiespía
-                $findAttribute('Compatibilidad') // Ej: iPhone 15, Samsung S24
+                $findAttribute('Compatibilidad'), // Ej: iPhone 15, Samsung S24
+                $findAttribute('Genero') // Ej: Transpar
             ],
             'Repuestos de Electrodomésticos' => [
                 $findAttribute('Tipo de Repuesto'), // Ej: Cuchilla de licuadora, Vaso
