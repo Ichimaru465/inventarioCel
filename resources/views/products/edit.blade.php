@@ -46,7 +46,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="sku">SKU</label>
+                        <label for="sku">Código</label>
                         <input type="text" id="sku" name="sku" value="{{ old('sku', $product->sku) }}" required>
                     </div>
 

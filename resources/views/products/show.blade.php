@@ -15,7 +15,7 @@
                 <span class="detail-value">{{ $product->id }}</span>
             </div>
             <div class="detail-item">
-                <span class="detail-label">SKU</span>
+                <span class="detail-label">Código</span>
                 <span class="detail-value">{{ $product->sku }}</span>
             </div>
              <div class="detail-item">

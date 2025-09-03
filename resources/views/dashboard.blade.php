@@ -146,7 +146,7 @@
 
 @section('content')
     <header class="main-header">
-        <h1>Dashboard</h1>
+        <h1>RESUMEN DEL INVENTARIO</h1>
         <div class="user-info">
             Hola, {{ Auth::user()->name }}
         </div>
@@ -158,7 +158,7 @@
             <p class="value">{{ $totalProducts }}</p>
         </div>
         <div class="card">
-            <h3>Items en Stock</h3>
+            <h3>Productos en Stock</h3>
             <p class="value">{{ $totalItemsInStock }}</p>
         </div>
         <div class="card">
@@ -178,7 +178,7 @@
                 <thead>
                     <tr>
                         <th>Producto</th>
-                        <th>SKU</th>
+                        <th>Código</th>
                         <th>Cantidad</th>
                     </tr>
                 </thead>
@@ -204,7 +204,7 @@
                 <thead>
                     <tr>
                         <th>Producto</th>
-                        <th>SKU</th>
+                        <th>Código</th>
                         <th>Añadido</th>
                     </tr>
                 </thead>
@@ -237,7 +237,7 @@
             <p class="value">{{ $totalSalesTodayCount }}</p>
         </div>
         <div class="card">
-            <h3>Items Vendidos</h3>
+            <h3>Productos Vendidos</h3>
             <p class="value">{{ $totalItemsSoldToday }}</p>
         </div>
     </section>
