@@ -25,25 +25,24 @@ class DashboardController extends Controller
     // --- MÉTRICAS DE VENTAS DEL DÍA ---
     $salesToday = InventoryMovement::where('type', 'salida')
                                    ->whereDate('created_at', today())
-                                   ->with('product')
+                                   ->with('product', 'user')
+                                   ->latest()
                                    ->get();
 
-    $totalSalesTodayCount = $salesToday->count();
-    $totalItemsSoldToday = $salesToday->sum('quantity');
-    $totalRevenueToday = $salesToday->sum(fn($movement) => $movement->quantity * ($movement->product->price ?? 0));
-    $latestSalesToday = $salesToday->sortByDesc('created_at')->take(5);
+                $totalSalesTodayCount = $salesToday->count();
+                $totalItemsSoldToday = $salesToday->sum('quantity');
+                $totalRevenueToday = $salesToday->sum(function ($movement) {
+                    $subtotal = $movement->quantity * ($movement->price ?? 0);
+                    $discount = $movement->discount_amount ?? 0;
+                    return $subtotal - $discount;
+                });
+                $latestSalesToday = $salesToday->take(5);
 
     // --- ENVIAR TODOS LOS DATOS A LA VISTA ---
     return view('dashboard', compact(
-        'totalProducts',
-        'totalItemsInStock',
-        'inventoryValue',
-        'totalCategories',
-        'lowStockProducts', // <-- Asegurarse de que esté aquí
-        'recentlyAddedProducts', // <-- Y aquí
-        'totalSalesTodayCount',
-        'totalItemsSoldToday',
-        'totalRevenueToday',
+        'totalProducts', 'totalItemsInStock', 'inventoryValue', 'totalCategories',
+        'lowStockProducts', 'recentlyAddedProducts',
+        'totalSalesTodayCount', 'totalItemsSoldToday', 'totalRevenueToday',
         'latestSalesToday'
     ));
 }

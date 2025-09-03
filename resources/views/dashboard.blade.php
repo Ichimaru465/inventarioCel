@@ -226,7 +226,7 @@
     </section>
 
     {{-- Tarjetas con el Resumen del Día --}}
-    <h2 style="font-weight: 600; margin-top: 30px; margin-bottom: 15px;">Resumen de Hoy ({{ now()->format('d/m/Y') }})</h2>
+    <h2 style="font-weight: 600; margin-bottom: 15px;">Resumen de Hoy ({{ now()->format('d/m/Y') }})</h2>
     <section class="stats-cards">
         <div class="card">
             <h3>Ingresos del Día</h3>
@@ -243,7 +243,7 @@
     </section>
 
     {{-- Panel de Ventas Recientes del Día --}}
-    <section class="panel full-width-panel" style="margin-top: 20px;">
+    <section class="panel full-width-panel" style="margin-top: 30px;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <h2>Ventas Recientes del Día</h2>
             <a href="{{ route('dashboard.sales.printToday') }}" target="_blank" class="btn btn-secondary">Imprimir Reporte del Día</a>
@@ -263,7 +263,7 @@
                     <tr>
                         <td>{{ $sale->product->name ?? 'Producto Eliminado' }}</td>
                         <td>{{ $sale->quantity }}</td>
-                        <td>S/ {{ number_format($sale->quantity * ($sale->product->price ?? 0), 2) }}</td>
+                        <td>S/ {{ number_format(($sale->quantity * $sale->price) - $sale->discount_amount, 2) }}</td>
                         <td>{{ $sale->user->name ?? 'N/A' }}</td>
                         <td>{{ $sale->created_at->format('h:i A') }}</td>
                     </tr>

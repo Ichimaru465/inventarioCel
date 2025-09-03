@@ -19,6 +19,8 @@ class InventoryMovement extends Model
         'user_id',
         'type',
         'quantity',
+        'price',
+        'discount_amount',
         'reason',
     ];
 

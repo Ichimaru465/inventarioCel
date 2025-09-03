@@ -7,53 +7,34 @@
     </header>
 
     <div class="content-wrapper"
-        {{-- Inicializamos el componente Alpine.js --}}
         x-data="{
             search: '',
             searchResults: [],
             cart: [],
             loading: false,
+            discountPercent: 0, /* <-- CORRECCIÓN 1: Inicializar variables */
+            discountFixed: 0,   /* <-- CORRECCIÓN 1: Inicializar variables */
 
-            searchProducts() {
-                if (this.search.length < 2) {
-                    this.searchResults = [];
-                    return;
-                }
-                this.loading = true;
-                fetch(`/api/products/search?q=${this.search}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        this.searchResults = data;
-                        this.loading = false;
-                    });
-            },
+            searchProducts() { if (this.search.length < 2) { this.searchResults = []; return; } this.loading = true; fetch(`/api/products/search?q=${this.search}`).then(res => res.json()).then(data => { this.searchResults = data; this.loading = false; }); },
+            addToCart(product) { const existing = this.cart.find(i => i.id === product.id); if (existing) { existing.quantity++; } else { this.cart.push({ ...product, quantity: 1 }); } this.search = ''; this.searchResults = []; },
+            removeFromCart(productId) { this.cart = this.cart.filter(i => i.id !== productId); },
 
-            addToCart(product) {
-                const existingProduct = this.cart.find(item => item.id === product.id);
-                if (existingProduct) {
-                    existingProduct.quantity++;
-                } else {
-                    this.cart.push({ ...product, quantity: 1 });
-                }
-                this.search = '';
-                this.searchResults = [];
-            },
-
-            removeFromCart(productId) {
-                this.cart = this.cart.filter(item => item.id !== productId);
-            },
-
-            get total() {
-                return this.cart.reduce((acc, item) => acc + (item.price * item.quantity), 0).toFixed(2);
-            }
+            get subtotal() { return this.cart.reduce((acc, item) => acc + (item.price * item.quantity), 0); },
+            get discountAmount() { let discount = 0; if (this.discountPercent > 0) { discount = (this.subtotal * this.discountPercent) / 100; } else if (this.discountFixed > 0) { discount = this.discountFixed; } return Math.min(discount, this.subtotal); },
+            get grandTotal() { return this.subtotal - this.discountAmount; }
         }">
 
         @if ($errors->any())
-            <div class="alert alert-danger" style="..."><ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
+            <div class="alert alert-danger" style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 20px;"><ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
         @endif
 
         <form action="{{ route('sales.store') }}" method="POST">
             @csrf
+
+            {{-- --}}
+            <input type="hidden" name="discount_percent" :value="discountPercent">
+            <input type="hidden" name="discount_fixed" :value="discountFixed">
+
             <div class="form-grid">
                 {{-- Columna de Búsqueda y Carrito --}}
                 <div class="form-column">
@@ -64,8 +45,7 @@
                                    x-model="search"
                                    @input.debounce.300ms="searchProducts()">
 
-                            {{-- Resultados de la búsqueda --}}
-                            <div x-show="searchResults.length > 0" class="search-results">
+                            <div x-show="searchResults.length > 0" class="search-results" x-cloak>
                                 <ul>
                                     <template x-for="product in searchResults" :key="product.id">
                                         <li @click="addToCart(product)">
@@ -78,7 +58,6 @@
                         </div>
                     </div>
 
-                    {{-- Carrito de Venta --}}
                     <h3>Productos en la Venta</h3>
                     <table class="table">
                         <thead>
@@ -95,7 +74,6 @@
                                 <tr>
                                     <td>
                                         <span x-text="item.name"></span>
-                                        {{-- Inputs ocultos para enviar los datos del carrito --}}
                                         <input type="hidden" :name="`products[${index}][product_id]`" :value="item.id">
                                     </td>
                                     <td x-text="`S/ ${parseFloat(item.price).toFixed(2)}`"></td>
@@ -119,9 +97,28 @@
                 <div class="form-column">
                     <div class="summary-card">
                         <h3>Resumen de la Venta</h3>
+                        <div class="summary-item">
+                            <span>Subtotal</span>
+                            <span x-text="`S/ ${subtotal.toFixed(2)}`"></span>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label>Descuento (%)</label>
+                            <input type="number" step="0.01" min="0" x-model.number="discountPercent" @input="discountFixed = 0" class="discount-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Descuento Fijo (S/)</label>
+                            <input type="number" step="0.01" min="0" x-model.number="discountFixed" @input="discountPercent = 0" class="discount-input">
+                        </div>
+
+                        <div class="summary-item" x-show="discountAmount > 0">
+                            <span>Descuento</span>
+                            <span x-text="`- S/ ${discountAmount.toFixed(2)}`" style="color: #ef4444;"></span>
+                        </div>
+                        <hr>
                         <div class="summary-total">
-                            <span>TOTAL</span>
-                            <span x-text="`S/ ${total}`"></span>
+                            <span>TOTAL A PAGAR</span>
+                            <span x-text="`S/ ${grandTotal.toFixed(2)}`"></span>
                         </div>
                         <button type="submit" class="btn btn-primary btn-lg" :disabled="cart.length === 0">Completar Venta</button>
                     </div>
@@ -143,5 +140,8 @@
         .summary-card { background: #f8fafc; padding: 20px; border-radius: 8px; }
         .summary-total { display: flex; justify-content: space-between; font-size: 24px; font-weight: bold; margin-bottom: 20px; }
         .btn-lg { width: 100%; padding: 15px; font-size: 18px; }
+        .summary-item { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .discount-input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%; box-sizing: border-box; }
+        hr { border: none; border-top: 1px solid #e2e8f0; margin: 15px 0; }
     </style>
 @endsection
