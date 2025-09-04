@@ -59,7 +59,11 @@ class DashboardController extends Controller
 
         // 2. Calcular los totales para el pie de página del reporte
         $totalItems = $salesToday->sum('quantity');
-        $totalRevenue = $salesToday->sum(fn($sale) => $sale->quantity * ($sale->product->price ?? 0));
+        $totalRevenue = $salesToday->sum(function ($sale) {
+            $subtotal = $sale->quantity * ($sale->price ?? $sale->product->price ?? 0);
+            $discount = $sale->discount_amount ?? 0;
+            return $subtotal - $discount;
+        });
 
         // 3. Devolver una nueva vista de impresión
         return view('dashboard.print_sales_today', compact('salesToday', 'totalItems', 'totalRevenue'));

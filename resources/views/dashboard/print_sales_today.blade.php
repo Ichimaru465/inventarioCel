@@ -23,27 +23,35 @@
             <tr>
                 <th>Hora</th>
                 <th>Producto</th>
-                <th>SKU</th>
+                <th>Código</th>
                 <th>Cant.</th>
                 <th>Precio Unit.</th>
+                <th>Descuento</th>
                 <th>Subtotal</th>
                 <th>Vendido por</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($salesToday as $sale)
+                @php
+                    $unitPrice = $sale->price ?? $sale->product->price ?? 0;
+                    $subtotal = $unitPrice * $sale->quantity;
+                    $discount = $sale->discount_amount ?? 0;
+                    $finalTotal = $subtotal - $discount;
+                @endphp
                 <tr>
                     <td>{{ $sale->created_at->format('h:i A') }}</td>
                     <td>{{ $sale->product->name ?? 'N/A' }}</td>
                     <td>{{ $sale->product->sku ?? 'N/A' }}</td>
                     <td>{{ $sale->quantity }}</td>
-                    <td class="text-right">S/ {{ number_format($sale->product->price ?? 0, 2) }}</td>
-                    <td class="text-right">S/ {{ number_format($sale->quantity * ($sale->product->price ?? 0), 2) }}</td>
+                    <td class="text-right">S/ {{ number_format($unitPrice, 2) }}</td>
+                    <td class="text-right">- S/ {{ number_format($discount, 2) }}</td>
+                    <td class="text-right">S/ {{ number_format($finalTotal, 2) }}</td>
                     <td>{{ $sale->user->name ?? 'N/A' }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" style="text-align: center;">No hay ventas que mostrar para hoy.</td>
+                    <td colspan="8" style="text-align: center;">No hay ventas que mostrar para hoy.</td>
                 </tr>
             @endforelse
         </tbody>
@@ -51,11 +59,13 @@
             <tr>
                 <td colspan="3" class="text-right"><strong>TOTALES</strong></td>
                 <td><strong>{{ $totalItems }}</strong></td>
-                <td colspan="1"></td>
+                <td></td>
+                <td></td>
                 <td class="text-right"><strong>S/ {{ number_format($totalRevenue, 2) }}</strong></td>
                 <td></td>
             </tr>
         </tfoot>
+
     </table>
 </body>
 </html>
