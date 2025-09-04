@@ -265,7 +265,7 @@
                         <td>{{ $sale->quantity }}</td>
                         <td>S/ {{ number_format(($sale->quantity * $sale->price) - $sale->discount_amount, 2) }}</td>
                         <td>{{ $sale->user->name ?? 'N/A' }}</td>
-                        <td>{{ $sale->created_at->format('h:i A') }}</td>
+                        <td>{{ $sale->created_at->timezone('America/Lima')->format('h:i A') }}</td>
                     </tr>
                 @empty
                     <tr>

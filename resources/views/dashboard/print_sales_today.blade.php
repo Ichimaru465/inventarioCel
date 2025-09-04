@@ -40,7 +40,7 @@
                     $finalTotal = $subtotal - $discount;
                 @endphp
                 <tr>
-                    <td>{{ $sale->created_at->format('h:i A') }}</td>
+                    <td>{{ $sale->created_at->timezone('America/Lima')->format('h:i A') }}</td>
                     <td>{{ $sale->product->name ?? 'N/A' }}</td>
                     <td>{{ $sale->product->sku ?? 'N/A' }}</td>
                     <td>{{ $sale->quantity }}</td>
