@@ -60,7 +60,7 @@ class UserController extends Controller
     /**
      * Actualiza un usuario existente.
      */
-    public function update(Request $request, User $user)
+public function update(Request $request, User $user)
     {
         $validatedData = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -69,9 +69,13 @@ class UserController extends Controller
             'password' => ['nullable', 'confirmed', Password::min(8)],
         ]);
 
-        // Si se proveyó una nueva contraseña, la actualizamos.
-        // Si no, mantenemos la anterior.
+        // Si se proveyó una nueva contraseña, validamos que no sea igual a la actual
         if (!empty($validatedData['password'])) {
+            // Verificar que la nueva contraseña no sea igual a la actual
+            if (Hash::check($validatedData['password'], $user->password)) {
+                return back()->withErrors(['password' => 'La nueva contraseña no puede ser igual a la contraseña actual.'])->withInput();
+            }
+
             $validatedData['password'] = Hash::make($validatedData['password']);
         } else {
             unset($validatedData['password']);
