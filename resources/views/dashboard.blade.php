@@ -173,7 +173,7 @@
 
     <section class="content-panels">
         <div class="panel">
-            <h2>Productos con Bajo Stock (<= 10)</h2>
+            <h2>Productos con Bajo Stock (<= 3)</h2>
             <table class="panel-table">
                 <thead>
                     <tr>

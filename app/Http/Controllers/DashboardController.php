@@ -19,7 +19,7 @@ class DashboardController extends Controller
     $totalCategories = Category::count();
 
     // --- PANELES ORIGINALES DEL DASHBOARD ---
-    $lowStockProducts = Product::where('quantity', '<=', 10)->orderBy('quantity', 'asc')->take(5)->get();
+    $lowStockProducts = Product::where('quantity', '<=', 3)->orderBy('quantity', 'asc')->take(5)->get();
     $recentlyAddedProducts = Product::latest()->take(5)->get();
 
     // --- MÉTRICAS DE VENTAS DEL DÍA ---
