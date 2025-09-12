@@ -59,7 +59,7 @@
                                 @endforeach
                             @endif
                         </td>
-                        <td class="{{ $product->quantity <= 10 ? 'low-stock' : '' }}">
+                        <td class="{{ $product->quantity <= 3 ? 'low-stock' : '' }}">
                             {{ $product->quantity }}
                         </td>
                         <td>S/ {{ number_format($product->price, 2) }}</td>
@@ -96,7 +96,7 @@
         </table>
 
         <div style="margin-top: 20px;">
-            {{ $products->appends(request()->query())->links() }}
+            {{ $products->appends(request()->query())->links('pagination::bootstrap-5') }}
         </div>
     </div>
 @endsection
