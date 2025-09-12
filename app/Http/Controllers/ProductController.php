@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Models\Brand;
 use App\Models\Supplier;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -27,7 +28,9 @@ class ProductController extends Controller
             $searchTerm = $request->input('search');
             $query->where(function($q) use ($searchTerm) {
                 $q->where('name', 'LIKE', "%{$searchTerm}%")
-                  ->orWhere('sku', 'LIKE', "%{$searchTerm}%");
+                  ->orWhere('sku', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere(DB::raw('LOWER(attributes)'), 'LIKE', "%{$searchTerm}%")
+                  ->orWhere(DB::raw('LOWER(description)'), 'LIKE', "%{$searchTerm}%");
             });
         }
 

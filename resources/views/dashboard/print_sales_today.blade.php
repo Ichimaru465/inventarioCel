@@ -15,7 +15,7 @@
     </style>
 </head>
 <body onload="window.print()">
-    <h1>Reporte de Ventas del Día</h1>
+    <h1>Reporte de Ventas del Día  - Accesorios Ramirez</h1>
     <p class="date-header">Fecha: {{ now()->format('d/m/Y') }}</p>
 
     <table>
@@ -23,7 +23,7 @@
             <tr>
                 <th>Hora</th>
                 <th>Producto</th>
-                <th>Código</th>
+                <th>Atributos</th>
                 <th>Cant.</th>
                 <th>Precio Unit.</th>
                 <th>Descuento</th>
@@ -42,7 +42,17 @@
                 <tr>
                     <td>{{ $sale->created_at->timezone('America/Lima')->format('h:i A') }}</td>
                     <td>{{ $sale->product->name ?? 'N/A' }}</td>
-                    <td>{{ $sale->product->sku ?? 'N/A' }}</td>
+                    <td class="attributes-cell">
+                        @if($sale->product && $sale->product->attributes)
+                            @foreach($sale->product->attributes as $key => $value)
+                                @if(!empty($value))
+                                    <strong>{{ ucfirst(str_replace('_', ' ', $key)) }}:</strong> {{ $value }}<br>
+                                @endif
+                            @endforeach
+                        @else
+                            <span>-</span>
+                        @endif
+                    </td>
                     <td>{{ $sale->quantity }}</td>
                     <td class="text-right">S/ {{ number_format($unitPrice, 2) }}</td>
                     <td class="text-right">- S/ {{ number_format($discount, 2) }}</td>
