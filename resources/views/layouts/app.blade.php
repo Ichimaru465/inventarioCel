@@ -110,6 +110,7 @@
             <ul class="sidebar-nav">
                 @if(in_array(auth()->user()->role, ['admin', 'employee']))
                     <li><a href="{{ route('sales.create') }}" class="{{ request()->routeIs('sales.create') ? 'active' : '' }}"><b>Registrar Venta</b></a></li>
+                    <li><a href="{{ route('sales.index') }}" class="{{ request()->routeIs('sales.index') ? 'active' : '' }}"><b>Boletas</b></a></li>
                     <li><a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a></li>
                     <li><a href="{{ route('products.index') }}" class="{{ request()->routeIs('products.*') ? 'active' : '' }}">Productos</a></li>
                 @endif

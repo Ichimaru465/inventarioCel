@@ -67,12 +67,15 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/products/{product}/sell', [ProductController::class, 'sell'])
         ->middleware('role:admin,employee')->name('products.sell');
-});
 
-// Rutas para Ventas (accesibles para admin y empleado)
-Route::middleware('role:admin,employee')->group(function () {
-    Route::get('/sales/create', [SaleController::class, 'create'])->name('sales.create');
-    Route::post('/sales', [SaleController::class, 'store'])->name('sales.store');
+    // Rutas para Ventas / Boletas (admin y empleado)
+    Route::middleware('role:admin,employee')->group(function () {
+        Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
+        Route::get('/sales/create', [SaleController::class, 'create'])->name('sales.create');
+        Route::post('/sales', [SaleController::class, 'store'])->name('sales.store');
+        Route::get('/sales/{sale}', [SaleController::class, 'show'])->name('sales.show');
+        Route::get('/sales/{sale}/receipt', [SaleController::class, 'downloadReceipt'])->name('sales.receipt.download');
+    });
 });
 
 // 3. AÑADE LA RUTA PARA CERRAR SESIÓN
