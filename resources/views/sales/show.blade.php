@@ -35,7 +35,7 @@
             <thead>
             <tr>
                 <th>Producto</th>
-                <th>SKU</th>
+                <th>Código</th>
                 <th>Cant.</th>
                 <th>Precio</th>
                 <th>Descuento</th>
