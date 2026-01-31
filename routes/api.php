@@ -24,8 +24,11 @@ Route::get('/products/search', function (Request $request) {
         return response()->json([]);
     }
 
-    $products = Product::where('name', 'LIKE', "%{$searchTerm}%")
-                       ->orWhere('sku', 'LIKE', "%{$searchTerm}%")
+    $products = Product::with('category')
+                       ->where(function($q) use ($searchTerm) {
+                           $q->where('name', 'LIKE', "%{$searchTerm}%")
+                             ->orWhere('sku', 'LIKE', "%{$searchTerm}%");
+                       })
                        ->where('quantity', '>', 0) // Solo mostrar productos con stock
                        ->take(10)
                        ->get();

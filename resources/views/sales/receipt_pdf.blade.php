@@ -42,6 +42,8 @@
         <tr>
             <th>Producto</th>
             <th>SKU</th>
+            <th>Categoría</th>
+            <th>Atributos</th>
             <th class="right">Cant.</th>
             <th class="right">Precio</th>
             <th class="right">Desc.</th>
@@ -56,6 +58,18 @@
             <tr>
                 <td>{{ $item->product_name }}</td>
                 <td>{{ $item->product_sku ?? '-' }}</td>
+                <td>{{ $item->product_category_name ?? 'Sin categoría' }}</td>
+                <td>
+                    @if($item->product_attributes)
+                        @foreach($item->product_attributes as $key => $value)
+                            @if(!empty($value))
+                                <strong>{{ ucfirst(str_replace('_', ' ', $key)) }}:</strong> {{ $value }}<br>
+                            @endif
+                        @endforeach
+                    @else
+                        <span>-</span>
+                    @endif
+                </td>
                 <td class="right">{{ $item->quantity }}</td>
                 <td class="right">S/ {{ number_format($item->price, 2) }}</td>
                 <td class="right">- S/ {{ number_format($item->discount_amount, 2) }}</td>

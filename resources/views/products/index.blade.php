@@ -68,14 +68,14 @@
                         <td>
                             <div class="actions-container">
                                 <a href="{{ route('products.show', $product) }}" class="btn btn-info">Ver</a>
-
+{{--
                                 @if(in_array(auth()->user()->role, ['admin', 'employee']))
                                     <form action="{{ route('products.sell', $product) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="btn btn-primary">Vender</button>
                                     </form>
                                 @endif
-
+--}}
                                 @if(auth()->user()->role === 'admin')
                                     <a href="{{ route('products.edit', $product) }}" class="btn btn-secondary">Editar</a>
                                     <form action="{{ route('products.destroy', $product) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este producto?');" style="display:inline;">

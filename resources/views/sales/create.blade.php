@@ -54,7 +54,11 @@
                                                     </span>
                                                 </template>
                                             </div>
-                                            <small x-text="`SKU: ${product.sku} - Stock: ${product.quantity}`"></small>
+                                            <small>
+                                                <span x-text="`SKU: ${product.sku}`"></span>
+                                                <span x-show="product.category" style="margin-left:8px;color:#6b7280;" x-text="`Categoria: ${product.category.name}`"></span>
+                                                <span style="margin-left:8px;color:#6b7280;" x-text="`Stock: ${product.quantity}`"></span>
+                                            </small>
                                         </li>
                                     </template>
                                 </ul>

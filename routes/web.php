@@ -67,6 +67,8 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/products/{product}/sell', [ProductController::class, 'sell'])
         ->middleware('role:admin,employee')->name('products.sell');
+        Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
+        Route::get('/dashboard/sales/print-today', [DashboardController::class, 'printTodaySales'])->name('dashboard.sales.printToday');
 
     // Rutas para Ventas / Boletas (admin y empleado)
     Route::middleware('role:admin,employee')->group(function () {

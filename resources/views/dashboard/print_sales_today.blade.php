@@ -24,6 +24,7 @@
                 <th>Hora</th>
                 <th>Producto</th>
                 <th>Atributos</th>
+                <th>Categoría</th>
                 <th>Cant.</th>
                 <th>Precio Unit.</th>
                 <th>Descuento</th>
@@ -53,6 +54,7 @@
                             <span>-</span>
                         @endif
                     </td>
+                    <td>{{ $sale->product->category->name ?? 'Sin categoría' }}</td>
                     <td>{{ $sale->quantity }}</td>
                     <td class="text-right">S/ {{ number_format($unitPrice, 2) }}</td>
                     <td class="text-right">- S/ {{ number_format($discount, 2) }}</td>
