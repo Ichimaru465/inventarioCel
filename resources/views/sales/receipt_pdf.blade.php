@@ -41,7 +41,7 @@
         <thead>
         <tr>
             <th>Producto</th>
-            <th>SKU</th>
+            <th>Código</th>
             <th>Categoría</th>
             <th>Atributos</th>
             <th class="right">Cant.</th>
