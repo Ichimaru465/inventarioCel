@@ -92,7 +92,7 @@ class SaleController extends Controller
     ]);
 
     $cartItems = $request->input('products');
-    $productsFromDB = Product::find(collect($cartItems)->pluck('product_id'));
+    $productsFromDB = Product::with('category')->find(collect($cartItems)->pluck('product_id'));
 
     // Calcular subtotal
     $subtotal = 0;
@@ -154,6 +154,8 @@ class SaleController extends Controller
                     'product_id' => $product->id,
                     'product_name' => $product->name,
                     'product_sku' => $product->sku,
+                    'product_category_name' => $product->category?->name,
+                    'product_attributes' => $product->attributes ?? [],
                     'price' => $product->price,
                     'quantity' => $quantityToSell,
                     'discount_amount' => $proportionalDiscount,

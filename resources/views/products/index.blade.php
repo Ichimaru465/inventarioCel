@@ -21,7 +21,7 @@
     <div class="search-bar-wrapper">
         <form action="{{ route('products.index') }}" method="GET">
             {{-- CAMBIO AQUÍ --}}
-            <input type="text" name="search" placeholder="Buscar por nombre o atributo..." value="{{ request('search') }}">
+            <input type="text" name="search" placeholder="Buscar por nombre, código o atributo..." value="{{ request('search') }}">
             <button type="submit" class="btn btn-primary">Buscar</button>
         </form>
     </div>

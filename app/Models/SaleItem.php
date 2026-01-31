@@ -14,9 +14,15 @@ class SaleItem extends Model
         'product_id',
         'product_name',
         'product_sku',
+        'product_category_name',
+        'product_attributes',
         'price',
         'quantity',
         'discount_amount',
+    ];
+
+    protected $casts = [
+        'product_attributes' => 'array',
     ];
 
     public function sale()

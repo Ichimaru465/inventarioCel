@@ -36,7 +36,7 @@
             <div class="form-grid">
                 <div class="form-column">
                     <div class="form-group">
-                        <label for="search">Buscar Producto por Nombre o Atributo</label>
+                        <label for="search">Buscar Producto por Nombre o Código</label>
                         <div style="position: relative;">
                             <input type="text" id="search" placeholder="Escribe para buscar..." class="search-input"
                                    x-model="search"
@@ -55,7 +55,7 @@
                                                 </template>
                                             </div>
                                             <small>
-                                                <span x-text="`SKU: ${product.sku}`"></span>
+                                                <span x-text="`Código: ${product.sku}`"></span>
                                                 <span x-show="product.category" style="margin-left:8px;color:#6b7280;" x-text="`Categoria: ${product.category.name}`"></span>
                                                 <span style="margin-left:8px;color:#6b7280;" x-text="`Stock: ${product.quantity}`"></span>
                                             </small>
