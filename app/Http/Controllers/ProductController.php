@@ -315,8 +315,9 @@ class ProductController extends Controller
             return $cat?->id;
         }
         if (!empty($data['category'])) {
-            $cat = Category::where('name', trim($data['category']))->first();
-            return $cat?->id;
+            $name = trim($data['category']);
+            $cat = Category::firstOrCreate(['name' => $name], ['name' => $name]);
+            return $cat->id;
         }
         return null;
     }
@@ -328,8 +329,9 @@ class ProductController extends Controller
             return $b?->id;
         }
         if (!empty($data['brand'])) {
-            $b = Brand::where('name', trim($data['brand']))->first();
-            return $b?->id;
+            $name = trim($data['brand']);
+            $b = Brand::firstOrCreate(['name' => $name], ['name' => $name]);
+            return $b->id;
         }
         return null;
     }
@@ -341,8 +343,9 @@ class ProductController extends Controller
             return $s?->id;
         }
         if (!empty($data['supplier'])) {
-            $s = Supplier::where('name', trim($data['supplier']))->first();
-            return $s?->id;
+            $name = trim($data['supplier']);
+            $s = Supplier::firstOrCreate(['name' => $name], ['name' => $name]);
+            return $s->id;
         }
         return null;
     }

@@ -56,9 +56,9 @@
                     <tr><td><code>price</code></td><td>Sí</td><td>Precio (número, ej. 10.50)</td></tr>
                     <tr><td><code>cost</code></td><td>No</td><td>Costo</td></tr>
                     <tr><td><code>quantity</code></td><td>No</td><td>Stock inicial (default 0)</td></tr>
-                    <tr><td><code>category_id</code> o <code>category</code></td><td>Sí</td><td>ID de categoría o nombre exacto</td></tr>
-                    <tr><td><code>brand_id</code> o <code>brand</code></td><td>No</td><td>ID o nombre de marca</td></tr>
-                    <tr><td><code>supplier_id</code> o <code>supplier</code></td><td>No</td><td>ID o nombre de proveedor</td></tr>
+                    <tr><td><code>category_id</code> o <code>category</code></td><td>Sí</td><td>ID de categoría o nombre; si no existe, se crea</td></tr>
+                    <tr><td><code>brand_id</code> o <code>brand</code></td><td>No</td><td>ID o nombre de marca; si no existe, se crea</td></tr>
+                    <tr><td><code>supplier_id</code> o <code>supplier</code></td><td>No</td><td>ID o nombre de proveedor; si no existe, se crea</td></tr>
                     <tr><td><code>attributes</code></td><td>No</td><td>JSON, ej. {"color":"Rojo","talla":"M"}</td></tr>
                 </tbody>
             </table>
