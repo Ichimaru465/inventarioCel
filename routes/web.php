@@ -48,6 +48,9 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
         Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+        Route::get('/products/import', [ProductController::class, 'importForm'])->name('products.import');
+        Route::post('/products/import', [ProductController::class, 'importProcess'])->name('products.import.process');
+        Route::get('/products/import/template', [ProductController::class, 'downloadImportTemplate'])->name('products.import.template');
         Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
         // Puedes añadir las rutas para edit, update y destroy aquí también
         Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');

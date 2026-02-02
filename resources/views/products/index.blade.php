@@ -8,7 +8,10 @@
 
         {{-- El botón "Añadir" solo se muestra si el usuario es admin --}}
         @if(auth()->user()->role === 'admin')
-            <a href="{{ route('products.create') }}" class="btn btn-primary">Añadir Nuevo Producto</a>
+            <div class="actions-container">
+                <a href="{{ route('products.create') }}" class="btn btn-primary">Añadir Nuevo Producto</a>
+                <a href="{{ route('products.import') }}" class="btn btn-secondary">Importar CSV</a>
+            </div>
         @endif
     </header>
 
