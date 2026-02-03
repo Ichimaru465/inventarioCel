@@ -35,8 +35,10 @@ class ProductController extends Controller
             });
         }
 
-        // 3. Paginar los resultados (filtrados o no)
-        $products = $query->paginate(10);
+        // 3. Paginar (por defecto 10; permitir 25 o 50 desde la URL)
+        $perPage = (int) $request->input('per_page', 10);
+        $perPage = in_array($perPage, [10, 25, 50], true) ? $perPage : 10;
+        $products = $query->paginate($perPage)->withQueryString();
 
         return view('products.index', compact('products'));
     }
