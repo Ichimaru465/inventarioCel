@@ -24,14 +24,24 @@ Route::get('/products/search', function (Request $request) {
         return response()->json([]);
     }
 
+    $limit = (int) $request->input('limit', 50);
+    $limit = max(1, min(50, $limit));
+
+    // Búsqueda por nombre, SKU y atributos (JSON como texto) - y prioriza coincidencias al inicio.
     $products = Product::with('category')
-                       ->where(function($q) use ($searchTerm) {
-                           $q->where('name', 'LIKE', "%{$searchTerm}%")
-                             ->orWhere('sku', 'LIKE', "%{$searchTerm}%");
-                       })
-                       ->where('quantity', '>', 0) // Solo mostrar productos con stock
-                       ->take(10)
-                       ->get();
+        ->where('quantity', '>', 0) // Solo mostrar productos con stock
+        ->where(function ($q) use ($searchTerm) {
+            $q->where('name', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('sku', 'LIKE', "%{$searchTerm}%")
+                ->orWhereRaw('LOWER(CAST(attributes AS CHAR)) LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
+        })
+        ->orderByRaw('CASE WHEN name LIKE ? THEN 0 WHEN sku LIKE ? THEN 1 ELSE 2 END', [
+            $searchTerm . '%',
+            $searchTerm . '%',
+        ])
+        ->orderBy('name')
+        ->limit($limit)
+        ->get();
 
     return response()->json($products);
 });
