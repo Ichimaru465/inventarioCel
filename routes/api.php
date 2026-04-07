@@ -24,8 +24,8 @@ Route::get('/products/search', function (Request $request) {
         return response()->json([]);
     }
 
-    $limit = (int) $request->input('limit', 50);
-    $limit = max(1, min(50, $limit));
+    $limit = (int) $request->input('limit', 200);
+    $limit = max(1, min(200, $limit));
 
     // Búsqueda por nombre, SKU y atributos (JSON como texto) - y prioriza coincidencias al inicio.
     $products = Product::with('category')
