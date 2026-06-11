@@ -15,9 +15,11 @@ use App\Models\Product;
 // ... rutas que ya tenías ...
 
 Route::get('/', function () {
-    return view('store.select', [
+    return response()->view('store.select', [
         'stores' => config('database.stores', []),
-    ]);
+    ])->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        ->header('Pragma', 'no-cache')
+        ->header('Expires', '0');
 })->name('store.select');
 
 Route::post('/select-store', function (Request $request) {
@@ -27,8 +29,11 @@ Route::post('/select-store', function (Request $request) {
 
     $store = config("database.stores.{$storeKey}");
 
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
+    if (Auth::check()) {
+        Auth::logout();
+    }
+
+    $request->session()->forget('store');
     $request->session()->put('store', [
         'key' => $storeKey,
         'connection' => $store['connection'],
