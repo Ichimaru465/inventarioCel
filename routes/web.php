@@ -93,6 +93,12 @@ Route::middleware(['store', 'auth'])->group(function () {
     })->middleware('role:admin,employee')->name('products.search');
 
     // Esta línea crea todas las rutas necesarias para el CRUD de productos (index, create, store, edit, update, destroy)
+    Route::get('/products/low-stock/download', [ProductController::class, 'downloadLowStock'])
+        ->middleware('role:admin,employee')->name('products.low-stock.download');
+
+    Route::get('/products/low-stock', [ProductController::class, 'lowStock'])
+        ->middleware('role:admin')->name('products.low-stock');
+
     Route::get('/products', [ProductController::class, 'index'])
         ->middleware('role:admin,employee')->name('products.index');
 

@@ -43,6 +43,17 @@ class ProductController extends Controller
         return view('products.index', compact('products'));
     }
 
+    public function lowStock()
+    {
+        $products = Product::with(['category', 'brand', 'supplier'])
+            ->where('quantity', '<=', 3)
+            ->orderBy('quantity')
+            ->orderBy('name')
+            ->paginate(25);
+
+        return view('products.low_stock', compact('products'));
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -282,6 +293,60 @@ class ProductController extends Controller
                 'Producto ejemplo', 'COD-001', 'Descripción', '10.50', '5.00', '20',
                 '1', '', '', '{"color":"Rojo","talla":"M"}',
             ]);
+            fclose($out);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function downloadLowStock(): StreamedResponse
+    {
+        $storeName = session('store.name', 'tienda');
+        $filename = 'productos_bajo_stock_' . str_replace(' ', '_', strtolower($storeName)) . '_' . now()->format('Ymd_His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function () {
+            $out = fopen('php://output', 'w');
+            fprintf($out, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            fputcsv($out, [
+                'ID',
+                'Codigo',
+                'Nombre',
+                'Categoria',
+                'Marca',
+                'Proveedor',
+                'Stock',
+                'Precio',
+                'Costo',
+                'Atributos',
+            ]);
+
+            Product::with(['category', 'brand', 'supplier'])
+                ->where('quantity', '<=', 3)
+                ->orderBy('quantity')
+                ->orderBy('name')
+                ->chunk(200, function ($products) use ($out) {
+                    foreach ($products as $product) {
+                        fputcsv($out, [
+                            $product->id,
+                            $product->sku,
+                            $product->name,
+                            $product->category->name ?? '',
+                            $product->brand->name ?? '',
+                            $product->supplier->name ?? '',
+                            $product->quantity,
+                            $product->price,
+                            $product->cost,
+                            $product->attributes ? json_encode($product->attributes, JSON_UNESCAPED_UNICODE) : '',
+                        ]);
+                    }
+                });
+
             fclose($out);
         };
 

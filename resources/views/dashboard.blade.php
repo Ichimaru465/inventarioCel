@@ -138,6 +138,8 @@
         .panel-table th { font-weight: 600; }
         .low-stock { color: #ef4444; font-weight: bold; }
         .no-data { color: #64748b; }
+        .panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 10px; }
+        .panel-heading h2 { border-bottom: 0; padding-bottom: 0; margin-bottom: 0; }
     </style>
 </head>
 @extends('layouts.app')
@@ -173,7 +175,10 @@
 
     <section class="content-panels">
         <div class="panel">
-            <h2>Productos con Bajo Stock (<= 3)</h2>
+            <div class="panel-heading">
+                <h2>Productos con Bajo Stock (<= 3)</h2>
+                <a href="{{ route('products.low-stock.download') }}" class="btn btn-info">Descargar Lista</a>
+            </div>
             <table class="panel-table">
                 <thead>
                     <tr>

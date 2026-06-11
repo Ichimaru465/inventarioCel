@@ -116,7 +116,7 @@
                     <li><a href="{{ route('sales.create') }}" class="{{ request()->routeIs('sales.create') ? 'active' : '' }}"><b>Registrar Venta</b></a></li>
                     <li><a href="{{ route('sales.index') }}" class="{{ request()->routeIs('sales.index') ? 'active' : '' }}"><b>Boletas</b></a></li>
                     <li><a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a></li>
-                    <li><a href="{{ route('products.index') }}" class="{{ request()->routeIs('products.*') ? 'active' : '' }}">Productos</a></li>
+                    <li><a href="{{ route('products.index') }}" class="{{ request()->routeIs('products.index', 'products.create', 'products.edit', 'products.show', 'products.import') ? 'active' : '' }}">Productos</a></li>
                 @endif
 
                 @if (auth()->user()->role === 'admin')
@@ -124,6 +124,7 @@
                     <li><a href="{{ route('brands.index') }}" class="{{ request()->routeIs('brands.*') ? 'active' : '' }}">Marcas</a></li>
                     <li><a href="{{ route('suppliers.index') }}" class="{{ request()->routeIs('suppliers.*') ? 'active' : '' }}">Proveedores</a></li>
                     <li><a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'active' : '' }}">Usuarios</a></li>
+                    <li><a href="{{ route('products.low-stock') }}" class="{{ request()->routeIs('products.low-stock') ? 'active' : '' }}">Bajo Stock</a></li>
                 @endif
             </ul>
         </aside>
