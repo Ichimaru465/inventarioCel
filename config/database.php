@@ -18,6 +18,17 @@ return [
 
     'default' => env('DB_CONNECTION', 'sqlite'),
 
+    'stores' => [
+        'tienda_1' => [
+            'name' => 'Tienda 1',
+            'connection' => 'tienda_1',
+        ],
+        'tienda_2' => [
+            'name' => 'Tienda 2',
+            'connection' => 'tienda_2',
+        ],
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Database Connections
@@ -51,6 +62,46 @@ return [
             'username' => env('DB_USERNAME', 'root'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => env('DB_CHARSET', 'utf8mb4'),
+            'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
+        'tienda_1' => [
+            'driver' => env('DB_TIENDA1_CONNECTION', 'mysql'),
+            'url' => env('DB_TIENDA1_URL'),
+            'host' => env('DB_TIENDA1_HOST', env('DB_HOST', '127.0.0.1')),
+            'port' => env('DB_TIENDA1_PORT', env('DB_PORT', '3306')),
+            'database' => env('DB_TIENDA1_DATABASE', 'inventario_tienda1'),
+            'username' => env('DB_TIENDA1_USERNAME', env('DB_USERNAME', 'root')),
+            'password' => env('DB_TIENDA1_PASSWORD', env('DB_PASSWORD', '')),
+            'unix_socket' => env('DB_TIENDA1_SOCKET', env('DB_SOCKET', '')),
+            'charset' => env('DB_CHARSET', 'utf8mb4'),
+            'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
+        'tienda_2' => [
+            'driver' => env('DB_TIENDA2_CONNECTION', 'mysql'),
+            'url' => env('DB_TIENDA2_URL'),
+            'host' => env('DB_TIENDA2_HOST', env('DB_HOST', '127.0.0.1')),
+            'port' => env('DB_TIENDA2_PORT', env('DB_PORT', '3306')),
+            'database' => env('DB_TIENDA2_DATABASE', 'inventario_tienda2'),
+            'username' => env('DB_TIENDA2_USERNAME', env('DB_USERNAME', 'root')),
+            'password' => env('DB_TIENDA2_PASSWORD', env('DB_PASSWORD', '')),
+            'unix_socket' => env('DB_TIENDA2_SOCKET', env('DB_SOCKET', '')),
             'charset' => env('DB_CHARSET', 'utf8mb4'),
             'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
             'prefix' => '',

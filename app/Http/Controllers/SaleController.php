@@ -20,7 +20,7 @@ class SaleController extends Controller
      */
     public function index()
     {
-        $sales = Sale::with(['user'])
+        $sales = Sale::with(['user', 'canceledBy'])
             ->latest()
             ->paginate(20);
 
@@ -40,7 +40,7 @@ class SaleController extends Controller
      */
     public function show(Sale $sale, Request $request)
     {
-        $sale->load(['items', 'user']);
+        $sale->load(['items', 'user', 'canceledBy']);
 
         $autoDownload = (bool) $request->boolean('download');
         return view('sales.show', compact('sale', 'autoDownload'));
@@ -51,7 +51,7 @@ class SaleController extends Controller
      */
     public function downloadReceipt(Sale $sale)
     {
-        $sale->load(['items', 'user']);
+        $sale->load(['items', 'user', 'canceledBy']);
 
         $path = $this->normalizeReceiptPath($sale->receipt_path);
 
@@ -180,9 +180,77 @@ class SaleController extends Controller
         ->with('success', '¡Venta registrada exitosamente! Se generó la boleta.');
 }
 
+    public function cancel(Request $request, Sale $sale)
+    {
+        abort_unless(Auth::user()?->role === 'admin', 403);
+
+        $validated = $request->validate([
+            'cancellation_reason' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        try {
+            DB::transaction(function () use ($sale, $validated) {
+                $sale = Sale::whereKey($sale->id)->lockForUpdate()->firstOrFail();
+
+                if ($sale->isCanceled()) {
+                    throw ValidationException::withMessages([
+                        'sale' => 'Esta venta ya fue anulada.',
+                    ]);
+                }
+
+                $sale->load('items');
+
+                foreach ($sale->items as $item) {
+                    if (! $item->product_id) {
+                        throw ValidationException::withMessages([
+                            'sale' => "No se puede anular la venta porque el producto {$item->product_name} ya no existe.",
+                        ]);
+                    }
+
+                    $product = Product::whereKey($item->product_id)->lockForUpdate()->first();
+
+                    if (! $product) {
+                        throw ValidationException::withMessages([
+                            'sale' => "No se puede anular la venta porque el producto {$item->product_name} ya no existe.",
+                        ]);
+                    }
+
+                    $product->increment('quantity', $item->quantity);
+
+                    InventoryMovement::create([
+                        'product_id' => $product->id,
+                        'user_id' => Auth::id(),
+                        'sale_id' => $sale->id,
+                        'type' => 'entrada',
+                        'quantity' => $item->quantity,
+                        'price' => $item->price,
+                        'discount_amount' => $item->discount_amount,
+                        'reason' => 'Anulacion de venta ' . ($sale->receipt_number ?? ('BOL-' . $sale->id)),
+                    ]);
+                }
+
+                $sale->update([
+                    'status' => 'canceled',
+                    'canceled_at' => now(),
+                    'canceled_by' => Auth::id(),
+                    'cancellation_reason' => $validated['cancellation_reason'] ?? null,
+                ]);
+            });
+        } catch (ValidationException $e) {
+            return back()->withErrors($e->errors());
+        }
+
+        $sale->refresh();
+        $this->generateAndStoreReceiptPdf($sale);
+
+        return redirect()
+            ->route('sales.index')
+            ->with('success', 'Venta anulada correctamente. El stock fue devuelto al inventario.');
+    }
+
     private function generateAndStoreReceiptPdf(Sale $sale): void
     {
-        $sale->loadMissing(['items', 'user']);
+        $sale->loadMissing(['items', 'user', 'canceledBy']);
 
         $pdf = Pdf::loadView('sales.receipt_pdf', [
             'sale' => $sale,

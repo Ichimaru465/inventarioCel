@@ -12,11 +12,29 @@
             --blue-900: #1e3a8a;
             --blue-600: #2563eb;
             --blue-400: #60a5fa;
+            --red-900: #7f1d1d;
+            --red-600: #dc2626;
+            --red-400: #f87171;
             --bg-white: #ffffff;
             --bg-light: #f8fafc;
             --text-main: #0f172a;
             --text-secondary: #64748b;
             --main-gradient: linear-gradient(135deg, #172554 0%, #1e40af 50%, #3b82f6 100%);
+            --store-gradient: var(--main-gradient);
+            --store-primary: var(--blue-600);
+            --store-secondary: var(--blue-400);
+            --store-dark: var(--blue-900);
+            --store-soft: #eff6ff;
+            --store-border: #bfdbfe;
+        }
+
+        body.store-red {
+            --store-gradient: linear-gradient(135deg, #450a0a 0%, #991b1b 50%, #ef4444 100%);
+            --store-primary: var(--red-600);
+            --store-secondary: var(--red-400);
+            --store-dark: var(--red-900);
+            --store-soft: #fef2f2;
+            --store-border: #fecaca;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -26,7 +44,7 @@
         /* --- IZQUIERDA --- */
         .left-panel {
             flex: 1.2;
-            background: var(--main-gradient);
+            background: var(--store-gradient);
             position: relative;
             display: flex;
             flex-direction: column;
@@ -83,6 +101,34 @@
         .login-header { margin-bottom: 35px; }
         .login-header h1 { font-size: 2rem; color: var(--text-main); font-weight: 700; margin-bottom: 10px; }
         .login-header p { color: var(--text-secondary); }
+        .selected-store {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: var(--store-soft);
+            color: var(--store-dark);
+            border: 1px solid var(--store-border);
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 26px;
+            font-weight: 700;
+        }
+        .selected-store a {
+            color: var(--store-primary);
+            font-size: 0.85rem;
+            text-decoration: none;
+            font-weight: 700;
+        }
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
 
         .form-group { margin-bottom: 24px; }
         .form-label { display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600; color: var(--text-main); }
@@ -116,14 +162,14 @@
 
         .input-container input:focus {
             outline: none;
-            border-color: var(--blue-600);
+            border-color: var(--store-primary);
             background: #fff;
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+            box-shadow: 0 0 0 4px color-mix(in srgb, var(--store-primary) 14%, transparent);
         }
 
         /* Cambiar color del SVG cuando el input tiene foco */
         .input-container input:focus + svg {
-            color: var(--blue-600);
+            color: var(--store-primary);
         }
 
         .btn-submit {
@@ -131,19 +177,19 @@
             padding: 16px;
             border: none;
             border-radius: 12px;
-            background: linear-gradient(90deg, var(--blue-600), var(--blue-400));
+            background: linear-gradient(90deg, var(--store-primary), var(--store-secondary));
             color: white;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
+            box-shadow: 0 10px 20px -5px color-mix(in srgb, var(--store-primary) 45%, transparent);
             display: flex; justify-content: center; align-items: center; gap: 10px;
         }
 
         .btn-submit:hover {
             transform: translateY(-2px);
-            box-shadow: 0 15px 30px -5px rgba(37, 99, 235, 0.5);
+            box-shadow: 0 15px 30px -5px color-mix(in srgb, var(--store-primary) 55%, transparent);
         }
 
         @media (max-width: 900px) {
@@ -155,7 +201,7 @@
         }
     </style>
 </head>
-<body>
+<body class="{{ session('store.key') === 'tienda_2' ? 'store-red' : '' }}">
 
     <div class="left-panel">
         <div class="circle-decoration circle-1"></div>
@@ -184,7 +230,16 @@
                 <p>Por favor ingresa tus credenciales.</p>
             </div>
 
-            <form method="POST" action="{{ route('login') }}">
+            <div class="selected-store">
+                <span>{{ session('store.name', 'Tienda seleccionada') }}</span>
+                <a href="{{ route('store.select') }}">Cambiar tienda</a>
+            </div>
+
+            @if ($errors->any())
+                <div class="error-message">{{ $errors->first() }}</div>
+            @endif
+
+            <form method="POST" action="{{ route('login.store') }}">
                 @csrf
                 
                 <div class="form-group">

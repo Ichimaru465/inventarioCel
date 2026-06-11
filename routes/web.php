@@ -4,25 +4,48 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\DashboardController; // <-- 1. IMPORTA EL CONTROLADOR
-use App\Http\Controllers\Auth\AuthenticatedSessionController; // <-- Puede que necesites importarlo para el logout
 use App\Http\Controllers\ProductController; // <-- Asegúrate de importar el controlador de productos
 use App\Http\Controllers\CategoryController; // <-- Asegúrate de importar el controlador de categorías
 use App\Http\Controllers\SupplierController; // <-- Asegúrate de importar el controlador de proveedores
 use App\Http\Controllers\BrandController; // <-- Asegúrate de importar el controlador de marcas
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\UserController; // <-- AÑADE ESTA LÍNEA
-use App\Models\Supplier;
-use App\Models\Product;
-use App\Models\Category;
-use App\Models\Brand;
 
 // ... rutas que ya tenías ...
 
 Route::get('/', function () {
-    return view('auth.login');
-})->name('login');
+    return view('store.select', [
+        'stores' => config('database.stores', []),
+    ]);
+})->name('store.select');
 
-Route::post('/', function (Request $request) {
+Route::post('/select-store', function (Request $request) {
+    $storeKey = $request->validate([
+        'store' => ['required', 'in:tienda_1,tienda_2'],
+    ])['store'];
+
+    $store = config("database.stores.{$storeKey}");
+
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    $request->session()->put('store', [
+        'key' => $storeKey,
+        'connection' => $store['connection'],
+        'name' => $store['name'],
+    ]);
+
+    return redirect()->route('login');
+})->name('store.select.store');
+
+Route::get('/login', function () {
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
+
+    return view('auth.login');
+})->middleware('store')->name('login');
+
+Route::post('/login', function (Request $request) {
     $credentials = $request->validate([
         'email' => ['required', 'email'],
         'password' => ['required'],
@@ -34,11 +57,11 @@ Route::post('/', function (Request $request) {
     }
 
     return back()->withErrors(['email' => 'Las credenciales proporcionadas no son correctas.'])->onlyInput('email');
-});
+})->middleware('store')->name('login.store');
 
 
 // 2. REEMPLAZA TU RUTA DASHBOARD ANTERIOR CON ESTA
-Route::middleware('auth')->group(function () {
+Route::middleware(['store', 'auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     // Esta línea crea todas las rutas necesarias para el CRUD de productos (index, create, store, edit, update, destroy)
     Route::get('/products', [ProductController::class, 'index'])
@@ -66,6 +89,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('suppliers', SupplierController::class);
         Route::resource('brands', BrandController::class);
         Route::resource('users', UserController::class); // <-- AÑADE ESTA LÍNEA
+        Route::patch('/sales/{sale}/cancel', [SaleController::class, 'cancel'])->name('sales.cancel');
     });
 
     Route::post('/products/{product}/sell', [ProductController::class, 'sell'])
@@ -89,4 +113,4 @@ Route::post('/logout', function (Request $request) {
     $request->session()->invalidate();
     $request->session()->regenerateToken();
     return redirect('/');
-})->name('logout');
+})->middleware('store')->name('logout');

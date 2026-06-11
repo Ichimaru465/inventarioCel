@@ -16,6 +16,14 @@ class Sale extends Model
         'discount_total',
         'total',
         'receipt_path',
+        'status',
+        'canceled_at',
+        'canceled_by',
+        'cancellation_reason',
+    ];
+
+    protected $casts = [
+        'canceled_at' => 'datetime',
     ];
 
     public function user()
@@ -26,6 +34,16 @@ class Sale extends Model
     public function items()
     {
         return $this->hasMany(SaleItem::class);
+    }
+
+    public function canceledBy()
+    {
+        return $this->belongsTo(User::class, 'canceled_by');
+    }
+
+    public function isCanceled(): bool
+    {
+        return $this->status === 'canceled';
     }
 }
 

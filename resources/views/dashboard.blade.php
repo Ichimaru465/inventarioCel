@@ -256,6 +256,9 @@
                     <th>Total</th>
                     <th>Vendido por</th>
                     <th>Hora</th>
+                    @if(auth()->user()->role === 'admin')
+                        <th>Acciones</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -266,10 +269,23 @@
                         <td>S/ {{ number_format(($sale->quantity * $sale->price) - $sale->discount_amount, 2) }}</td>
                         <td>{{ $sale->user->name ?? 'N/A' }}</td>
                         <td>{{ $sale->created_at->timezone('America/Lima')->format('h:i A') }}</td>
+                        @if(auth()->user()->role === 'admin')
+                            <td>
+                                @if($sale->sale_id)
+                                    <form method="POST" action="{{ route('sales.cancel', $sale->sale_id) }}" onsubmit="return confirm('¿Seguro que deseas anular esta venta? El stock volverá al inventario.');">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="btn btn-danger">Anular</button>
+                                    </form>
+                                @else
+                                    <span class="no-data">No disponible</span>
+                                @endif
+                            </td>
+                        @endif
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="no-data">Aún no se han registrado ventas hoy.</td>
+                        <td colspan="{{ auth()->user()->role === 'admin' ? 6 : 5 }}" class="no-data">Aún no se han registrado ventas hoy.</td>
                     </tr>
                 @endforelse
             </tbody>

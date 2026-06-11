@@ -17,11 +17,32 @@
             </div>
         @endif
 
+        @if ($errors->any())
+            <div class="alert alert-danger" style="background-color: #fee2e2; color: #991b1b; padding: 10px; border-radius: 4px; margin-bottom: 20px;">
+                {{ $errors->first() }}
+            </div>
+        @endif
+
         <div style="display:flex; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
             <div>
                 <div><strong>Boleta:</strong> {{ $sale->receipt_number ?? ('BOL-' . $sale->id) }}</div>
                 <div><strong>Fecha:</strong> {{ $sale->created_at->timezone('America/Lima')->format('d/m/Y h:i A') }}</div>
                 <div><strong>Vendedor:</strong> {{ $sale->user->name ?? 'N/A' }}</div>
+                <div>
+                    <strong>Estado:</strong>
+                    @if($sale->isCanceled())
+                        <span style="background:#fee2e2;color:#991b1b;padding:4px 8px;border-radius:12px;font-size:.8em;font-weight:700;">Anulada</span>
+                    @else
+                        <span style="background:#dcfce7;color:#166534;padding:4px 8px;border-radius:12px;font-size:.8em;font-weight:700;">Completada</span>
+                    @endif
+                </div>
+                @if($sale->isCanceled())
+                    <div><strong>Anulada por:</strong> {{ $sale->canceledBy->name ?? 'N/A' }}</div>
+                    <div><strong>Fecha de anulación:</strong> {{ $sale->canceled_at?->timezone('America/Lima')->format('d/m/Y h:i A') }}</div>
+                    @if($sale->cancellation_reason)
+                        <div><strong>Motivo:</strong> {{ $sale->cancellation_reason }}</div>
+                    @endif
+                @endif
             </div>
             <div style="min-width: 220px;">
                 <div style="display:flex; justify-content: space-between;"><span>Subtotal</span><strong>S/ {{ number_format($sale->subtotal, 2) }}</strong></div>
@@ -30,6 +51,14 @@
                 <div style="display:flex; justify-content: space-between; font-size: 18px;"><span>Total</span><strong>S/ {{ number_format($sale->total, 2) }}</strong></div>
             </div>
         </div>
+
+        @if(auth()->user()->role === 'admin' && ! $sale->isCanceled())
+            <form method="POST" action="{{ route('sales.cancel', $sale) }}" style="margin-top:20px;" onsubmit="return confirm('¿Seguro que deseas anular esta venta? El stock volverá al inventario.');">
+                @csrf
+                @method('PATCH')
+                <button type="submit" class="btn btn-danger">Anular venta</button>
+            </form>
+        @endif
 
         <table class="table" style="margin-top: 20px;">
             <thead>

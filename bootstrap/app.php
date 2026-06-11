@@ -13,8 +13,16 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-        'role' => \App\Http\Middleware\CheckRole::class,
-    ]);
+            'role' => \App\Http\Middleware\CheckRole::class,
+            'store' => \App\Http\Middleware\SetStoreConnection::class,
+        ]);
+
+        $middleware->priority([
+            \Illuminate\Session\Middleware\StartSession::class,
+            \App\Http\Middleware\SetStoreConnection::class,
+            \Illuminate\Auth\Middleware\Authenticate::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

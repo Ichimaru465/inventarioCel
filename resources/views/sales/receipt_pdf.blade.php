@@ -18,6 +18,7 @@
         .totals .label { text-align: right; padding-right: 10px; }
         .totals .value { text-align: right; width: 120px; }
         .footer { text-align: center; margin-top: 18px; color: #6b7280; font-size: 11px; }
+        .status-canceled { margin: 10px 0 14px; padding: 8px; text-align: center; border: 1px solid #991b1b; color: #991b1b; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -36,6 +37,15 @@
             <td></td>
         </tr>
     </table>
+
+    @if($sale->isCanceled())
+        <div class="status-canceled">
+            VENTA ANULADA
+            @if($sale->canceled_at)
+                - {{ $sale->canceled_at->timezone('America/Lima')->format('d/m/Y h:i A') }}
+            @endif
+        </div>
+    @endif
 
     <table class="table">
         <thead>

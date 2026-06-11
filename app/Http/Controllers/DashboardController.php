@@ -24,6 +24,10 @@ class DashboardController extends Controller
 
     // --- MÉTRICAS DE VENTAS DEL DÍA ---
     $salesToday = InventoryMovement::where('type', 'salida')
+                                   ->where(function ($query) {
+                                       $query->whereNull('sale_id')
+                                             ->orWhereHas('sale', fn ($saleQuery) => $saleQuery->where('status', '!=', 'canceled'));
+                                   })
                                    ->whereDate('created_at', today())
                                    ->with('product', 'user')
                                    ->latest()
@@ -52,6 +56,10 @@ class DashboardController extends Controller
     {
         // 1. Obtener todas las ventas de hoy
         $salesToday = InventoryMovement::where('type', 'salida')
+                                       ->where(function ($query) {
+                                           $query->whereNull('sale_id')
+                                                 ->orWhereHas('sale', fn ($saleQuery) => $saleQuery->where('status', '!=', 'canceled'));
+                                       })
                                        ->whereDate('created_at', today())
                                        ->with('product', 'user')
                                        ->latest()

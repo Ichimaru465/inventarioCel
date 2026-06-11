@@ -14,6 +14,8 @@
 
         /* Estilos Generales */
         body{margin:0;font-family:'Nunito',sans-serif;background-color:#f4f6f9;color:#333}
+        body.store-red{--sidebar-bg:#7f1d1d;--sidebar-border:#991b1b;--sidebar-hover:#b91c1c;--store-badge-color:#fecaca}
+        body:not(.store-red){--sidebar-bg:#1e293b;--sidebar-border:#334155;--sidebar-hover:#334155;--store-badge-color:#bfdbfe}
         .dashboard-container{display:flex;min-height:100vh}
         .main-content{flex:1;padding:30px}
         .main-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px}
@@ -35,16 +37,17 @@
         .actions-container{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.actions-container form{margin:0}
 
         /* Estilos de Barra Lateral */
-        .sidebar{width:250px;background-color:#1e293b;color:white;display:flex;flex-direction:column;transition:transform 0.3s ease-in-out;flex-shrink:0;}
-        .sidebar-header{padding:20px;text-align:center;border-bottom:1px solid #334155;}
+        .sidebar{width:250px;background-color:var(--sidebar-bg);color:white;display:flex;flex-direction:column;transition:transform 0.3s ease-in-out;flex-shrink:0;}
+        .sidebar-header{padding:20px;text-align:center;border-bottom:1px solid var(--sidebar-border);}
         .app-logo{max-height:150px;width:auto;}
-        .sidebar-user-panel{padding:15px;border-bottom:1px solid #334155;display:flex;justify-content:space-between;align-items:center}
+        .sidebar-user-panel{padding:15px;border-bottom:1px solid var(--sidebar-border);display:flex;justify-content:space-between;align-items:center}
         .user-info .user-name{color:white;font-weight:600;display:block}.user-info .user-role{color:#94a3b8;font-size:.8em}
-        .logout-link{background-color:#334155;color:#e2e8f0;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-size:14px;text-decoration:none;transition:background-color .2s}
+        .store-badge{display:block;margin-top:6px;color:var(--store-badge-color);font-size:.8em;font-weight:700}
+        .logout-link{background-color:var(--sidebar-border);color:#e2e8f0;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-size:14px;text-decoration:none;transition:background-color .2s}
         .logout-link:hover{background-color:#ef4444;color:white}
         .sidebar-nav{list-style:none;padding:20px 0;margin:0;flex-grow:1}
         .sidebar-nav a{display:block;color:#cbd5e1;text-decoration:none;padding:15px 20px;transition:background-color .3s,color .3s}
-        .sidebar-nav a:hover,.sidebar-nav a.active{background-color:#334155;color:white}
+        .sidebar-nav a:hover,.sidebar-nav a.active{background-color:var(--sidebar-hover);color:white}
 
         /* Estilos Responsive */
         .mobile-header { display: none; }
@@ -71,7 +74,7 @@
             }
             .mobile-header {
                 display: flex; align-items: center; justify-content: space-between;
-                padding: 10px 15px; background-color: #1e293b; color: white;
+                padding: 10px 15px; background-color: var(--sidebar-bg); color: white;
                 position: fixed; top: 0; left: 0; right: 0; z-index: 500;
             }
             .hamburger-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
@@ -88,7 +91,7 @@
     </style>
 </head>
 
-<body x-data="{ sidebarOpen: false }">
+<body class="{{ session('store.key') === 'tienda_2' ? 'store-red' : '' }}" x-data="{ sidebarOpen: false }">
     <div x-show="sidebarOpen" @click="sidebarOpen = false" class="sidebar-overlay" x-cloak></div>
 
     <div class="dashboard-container">
@@ -100,6 +103,7 @@
                 <div class="user-info">
                     <span class="user-name">Hola, {{ Auth::user()->name }}</span>
                     <span class="user-role">{{ ucfirst(Auth::user()->role) }}</span>
+                    <span class="store-badge">{{ session('store.name', 'Sin tienda') }}</span>
                 </div>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
