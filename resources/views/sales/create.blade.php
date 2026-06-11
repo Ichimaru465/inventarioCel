@@ -6,53 +6,7 @@
         <h1>Registrar Nueva Venta</h1>
     </header>
 
-    <div class="content-wrapper"
-        x-data="{
-            search: '',
-            searchResults: [],
-            cart: [],
-            loading: false,
-            discountPercent: 0,
-            discountFixed: 0,
-            searchUrl: @json(route('products.search')),
-
-            searchProducts() {
-                if (this.search.length < 2) {
-                    this.searchResults = [];
-                    return;
-                }
-
-                this.loading = true;
-                const params = new URLSearchParams({ q: this.search });
-
-                fetch(`${this.searchUrl}?${params.toString()}`, {
-                    headers: { 'Accept': 'application/json' },
-                })
-                    .then(res => {
-                        if (!res.ok) {
-                            throw new Error(`Error ${res.status} al buscar productos`);
-                        }
-
-                        return res.json();
-                    })
-                    .then(data => {
-                        this.searchResults = data;
-                    })
-                    .catch(error => {
-                        console.error(error);
-                        this.searchResults = [];
-                    })
-                    .finally(() => {
-                        this.loading = false;
-                    });
-            },
-            addToCart(product) { const existing = this.cart.find(i => i.id === product.id); if (existing) { existing.quantity++; } else { this.cart.push({ ...product, quantity: 1 }); } this.search = ''; this.searchResults = []; },
-            removeFromCart(productId) { this.cart = this.cart.filter(i => i.id !== productId); },
-
-            get subtotal() { return this.cart.reduce((acc, item) => acc + (item.price * item.quantity), 0); },
-            get discountAmount() { let discount = 0; if (this.discountPercent > 0) { discount = (this.subtotal * this.discountPercent) / 100; } else if (this.discountFixed > 0) { discount = this.discountFixed; } return Math.min(discount, this.subtotal); },
-            get grandTotal() { return this.subtotal - this.discountAmount; }
-        }">
+    <div class="content-wrapper" x-data="saleForm()">
 
         @if ($errors->any())
             <div class="alert alert-danger" style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 20px;"><ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
@@ -178,5 +132,87 @@
         }
         .attribute-tag-sm strong { text-transform: capitalize; }
     </style>
+
+    <script>
+        function saleForm() {
+            return {
+                search: '',
+                searchResults: [],
+                cart: [],
+                loading: false,
+                discountPercent: 0,
+                discountFixed: 0,
+                searchUrl: @json(route('products.search')),
+
+                searchProducts() {
+                    if (this.search.length < 2) {
+                        this.searchResults = [];
+                        return;
+                    }
+
+                    this.loading = true;
+                    const params = new URLSearchParams({ q: this.search });
+
+                    fetch(`${this.searchUrl}?${params.toString()}`, {
+                        headers: { 'Accept': 'application/json' },
+                    })
+                        .then((res) => {
+                            if (!res.ok) {
+                                throw new Error(`Error ${res.status} al buscar productos`);
+                            }
+
+                            return res.json();
+                        })
+                        .then((data) => {
+                            this.searchResults = data;
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                            this.searchResults = [];
+                        })
+                        .finally(() => {
+                            this.loading = false;
+                        });
+                },
+
+                addToCart(product) {
+                    const existing = this.cart.find((item) => item.id === product.id);
+
+                    if (existing) {
+                        existing.quantity++;
+                    } else {
+                        this.cart.push({ ...product, quantity: 1 });
+                    }
+
+                    this.search = '';
+                    this.searchResults = [];
+                },
+
+                removeFromCart(productId) {
+                    this.cart = this.cart.filter((item) => item.id !== productId);
+                },
+
+                get subtotal() {
+                    return this.cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+                },
+
+                get discountAmount() {
+                    let discount = 0;
+
+                    if (this.discountPercent > 0) {
+                        discount = (this.subtotal * this.discountPercent) / 100;
+                    } else if (this.discountFixed > 0) {
+                        discount = this.discountFixed;
+                    }
+
+                    return Math.min(discount, this.subtotal);
+                },
+
+                get grandTotal() {
+                    return this.subtotal - this.discountAmount;
+                },
+            };
+        }
+    </script>
 @endsection
 
