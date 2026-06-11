@@ -14,8 +14,38 @@
             loading: false,
             discountPercent: 0,
             discountFixed: 0,
+            searchUrl: @json(route('products.search')),
 
-            searchProducts() { if (this.search.length < 2) { this.searchResults = []; return; } this.loading = true; fetch(`/api/products/search?q=${this.search}`).then(res => res.json()).then(data => { this.searchResults = data; this.loading = false; }); },
+            searchProducts() {
+                if (this.search.length < 2) {
+                    this.searchResults = [];
+                    return;
+                }
+
+                this.loading = true;
+                const params = new URLSearchParams({ q: this.search });
+
+                fetch(`${this.searchUrl}?${params.toString()}`, {
+                    headers: { 'Accept': 'application/json' },
+                })
+                    .then(res => {
+                        if (!res.ok) {
+                            throw new Error(`Error ${res.status} al buscar productos`);
+                        }
+
+                        return res.json();
+                    })
+                    .then(data => {
+                        this.searchResults = data;
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        this.searchResults = [];
+                    })
+                    .finally(() => {
+                        this.loading = false;
+                    });
+            },
             addToCart(product) { const existing = this.cart.find(i => i.id === product.id); if (existing) { existing.quantity++; } else { this.cart.push({ ...product, quantity: 1 }); } this.search = ''; this.searchResults = []; },
             removeFromCart(productId) { this.cart = this.cart.filter(i => i.id !== productId); },
 

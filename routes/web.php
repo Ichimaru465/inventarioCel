@@ -10,6 +10,7 @@ use App\Http\Controllers\SupplierController; // <-- Asegúrate de importar el co
 use App\Http\Controllers\BrandController; // <-- Asegúrate de importar el controlador de marcas
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\UserController; // <-- AÑADE ESTA LÍNEA
+use App\Models\Product;
 
 // ... rutas que ya tenías ...
 
@@ -63,6 +64,34 @@ Route::post('/login', function (Request $request) {
 // 2. REEMPLAZA TU RUTA DASHBOARD ANTERIOR CON ESTA
 Route::middleware(['store', 'auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/products/search', function (Request $request) {
+        $searchTerm = $request->input('q');
+
+        if (! $searchTerm) {
+            return response()->json([]);
+        }
+
+        $limit = (int) $request->input('limit', 200);
+        $limit = max(1, min(200, $limit));
+
+        $products = Product::with('category')
+            ->where('quantity', '>', 0)
+            ->where(function ($query) use ($searchTerm) {
+                $query->where('name', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('sku', 'LIKE', "%{$searchTerm}%")
+                    ->orWhereRaw('LOWER(CAST(attributes AS CHAR)) LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
+            })
+            ->orderByRaw('CASE WHEN name LIKE ? THEN 0 WHEN sku LIKE ? THEN 1 ELSE 2 END', [
+                $searchTerm . '%',
+                $searchTerm . '%',
+            ])
+            ->orderBy('name')
+            ->limit($limit)
+            ->get();
+
+        return response()->json($products);
+    })->middleware('role:admin,employee')->name('products.search');
+
     // Esta línea crea todas las rutas necesarias para el CRUD de productos (index, create, store, edit, update, destroy)
     Route::get('/products', [ProductController::class, 'index'])
         ->middleware('role:admin,employee')->name('products.index');
