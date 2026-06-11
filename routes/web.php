@@ -43,7 +43,7 @@ Route::get('/login', function () {
         return redirect()->route('dashboard');
     }
 
-    return view('auth.login');
+    return view('Auth.Login');
 })->middleware('store')->name('login');
 
 Route::post('/login', function (Request $request) {
