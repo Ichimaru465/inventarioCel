@@ -92,12 +92,26 @@ class SaleController extends Controller
     ]);
 
     $cartItems = $request->input('products');
-    $productsFromDB = Product::with('category')->find(collect($cartItems)->pluck('product_id'));
+    $productIds = collect($cartItems)->pluck('product_id')->unique()->values();
+    $productsFromDB = Product::with('category')->whereIn('id', $productIds)->get()->keyBy('id');
+
+    if ($productsFromDB->count() !== $productIds->count()) {
+        return redirect()->back()
+            ->withErrors(['products' => 'Uno o más productos ya no existen en esta tienda. Actualiza la búsqueda y vuelve a intentar.'])
+            ->withInput();
+    }
 
     // Calcular subtotal
     $subtotal = 0;
     foreach ($cartItems as $item) {
-        $product = $productsFromDB->find($item['product_id']);
+        $product = $productsFromDB->get($item['product_id']);
+
+        if (! $product || $product->quantity < $item['quantity']) {
+            return redirect()->back()
+                ->withErrors(['products' => "Stock insuficiente para: " . ($product->name ?? 'producto no disponible') . "."])
+                ->withInput();
+        }
+
         $subtotal += $product->price * $item['quantity'];
     }
 
@@ -123,11 +137,11 @@ class SaleController extends Controller
             ]);
 
             foreach ($cartItems as $item) {
-                $product = $productsFromDB->find($item['product_id']);
+                $product = Product::with('category')->whereKey($item['product_id'])->lockForUpdate()->first();
                 $quantityToSell = $item['quantity'];
 
-                if ($product->quantity < $quantityToSell) {
-                    throw ValidationException::withMessages(['products' => "Stock insuficiente para: {$product->name}."]);
+                if (! $product || $product->quantity < $quantityToSell) {
+                    throw ValidationException::withMessages(['products' => "Stock insuficiente para: " . ($product->name ?? 'producto no disponible') . "."]);
                 }
 
                 // Calcular descuento proporcional para este item

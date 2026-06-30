@@ -114,7 +114,6 @@ Route::middleware(['store', 'auth'])->group(function () {
         Route::get('/products/import', [ProductController::class, 'importForm'])->name('products.import');
         Route::post('/products/import', [ProductController::class, 'importProcess'])->name('products.import.process');
         Route::get('/products/import/template', [ProductController::class, 'downloadImportTemplate'])->name('products.import.template');
-        Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
         // Puedes añadir las rutas para edit, update y destroy aquí también
         Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
         Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
