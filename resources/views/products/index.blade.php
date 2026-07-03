@@ -9,12 +9,14 @@
         {{-- El botón "Añadir" solo se muestra si el usuario es admin --}}
         @if(auth()->user()->role === 'admin')
             <div class="actions-container">
+                <a href="{{ route('products.download') }}" class="btn btn-info">Descargar Excel</a>
                 <a href="{{ route('products.low-stock.download') }}" class="btn btn-info">Descargar Bajo Stock</a>
                 <a href="{{ route('products.create') }}" class="btn btn-primary">Añadir Nuevo Producto</a>
                 <a href="{{ route('products.import') }}" class="btn btn-secondary">Importar CSV</a>
             </div>
         @else
             <div class="actions-container">
+                <a href="{{ route('products.download') }}" class="btn btn-info">Descargar Excel</a>
                 <a href="{{ route('products.low-stock.download') }}" class="btn btn-info">Descargar Bajo Stock</a>
             </div>
         @endif

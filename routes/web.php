@@ -104,6 +104,9 @@ Route::middleware(['store', 'auth'])->group(function () {
     Route::get('/products/low-stock', [ProductController::class, 'lowStock'])
         ->middleware('role:admin')->name('products.low-stock');
 
+    Route::get('/products/download', [ProductController::class, 'downloadAllProducts'])
+        ->middleware('role:admin,employee')->name('products.download');
+
     Route::get('/products', [ProductController::class, 'index'])
         ->middleware('role:admin,employee')->name('products.index');
 

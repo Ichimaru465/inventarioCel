@@ -353,6 +353,62 @@ class ProductController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
+    public function downloadAllProducts(): StreamedResponse
+    {
+        $storeName = session('store.name', 'tienda');
+        $filename = 'productos_registrados_' . str_replace(' ', '_', strtolower($storeName)) . '_' . now()->format('Ymd_His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function () {
+            $out = fopen('php://output', 'w');
+            fprintf($out, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            fputcsv($out, [
+                'ID',
+                'Codigo',
+                'Nombre',
+                'Descripcion',
+                'Categoria',
+                'Marca',
+                'Proveedor',
+                'Stock',
+                'Precio',
+                'Costo',
+                'Atributos',
+                'Fecha de registro',
+            ]);
+
+            Product::with(['category', 'brand', 'supplier'])
+                ->orderBy('name')
+                ->chunk(200, function ($products) use ($out) {
+                    foreach ($products as $product) {
+                        fputcsv($out, [
+                            $product->id,
+                            $product->sku,
+                            $product->name,
+                            $product->description,
+                            $product->category->name ?? '',
+                            $product->brand->name ?? '',
+                            $product->supplier->name ?? '',
+                            $product->quantity,
+                            $product->price,
+                            $product->cost,
+                            $product->attributes ? json_encode($product->attributes, JSON_UNESCAPED_UNICODE) : '',
+                            $product->created_at?->format('d/m/Y H:i'),
+                        ]);
+                    }
+                });
+
+            fclose($out);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
     private function parseCsv(UploadedFile $file): array
     {
         $path = $file->getRealPath();
